@@ -159,37 +159,46 @@ public class PegProcessor implements ICommand {
                 String pegId = line.get(this.colIdx);
                 this.addSequence(pegId);
             }
-            // Now we shuffle in input sequences, and for each one, we write it along with
-            // the specified number of neighbors.
-            int sequenceCount = this.seqBatch.size();
-            if (this.debug) System.err.println("Shuffling " + sequenceCount + " input sequences.");
-            this.seqBatch.shuffle(sequenceCount);
-            // Create a buffer for counter-example sequences.
-            ArrayList<Sequence> buffer = new ArrayList<Sequence>(this.extraFeatures);
-            // Open the output stream.
-            if (this.maxCols == 0) this.maxCols = this.seqBatch.longest();
-            if (this.debug) System.err.println("Producing output with column bias of " + this.maxCols + ".");
-            this.output = SequenceWriter.create(this.format, System.out, this.maxCols);
-            for (Sequence seq : this.seqBatch) {
-                // First, write this sequence.
-                this.output.write(seq);
-                // Get the pegs for this sequence's genome.
-                String seqId = seq.getLabel();
-                PegList genomePegs = this.getGenome(seqId);
-                // Now find the extras.  These are written as counter-examples.
-                buffer.clear();
-                genomePegs.findClose(seq, this.extraFeatures, buffer);
-                for (Sequence seq2 : buffer) {
-                    seq2.setComment("0");
-                    this.output.write(seq2);
-                    // Insure the peg isn't re-used.
-                    genomePegs.suppress(seq2);
-                }
-            }
+            // Produce the output from the pegs.
+            processPegs();
             // Close and flush the output.
             this.output.close();
         } catch (IOException e) {
             e.printStackTrace(System.err);
+        }
+    }
+
+    /**
+     * Shuffle the input sequences and write them out along with the specified number
+     * of neighbors.
+     *
+     * @throws IOException
+     */
+    protected void processPegs() throws IOException {
+        int sequenceCount = this.seqBatch.size();
+        if (this.debug) System.err.println("Shuffling " + sequenceCount + " input sequences.");
+        this.seqBatch.shuffle(sequenceCount);
+        // Create a buffer for counter-example sequences.
+        ArrayList<Sequence> buffer = new ArrayList<Sequence>(this.extraFeatures);
+        // Open the output stream.
+        if (this.maxCols == 0) this.maxCols = this.seqBatch.longest();
+        if (this.debug) System.err.println("Producing output with column bias of " + this.maxCols + ".");
+        this.output = SequenceWriter.create(this.format, System.out, this.maxCols);
+        for (Sequence seq : this.seqBatch) {
+            // First, write this sequence.
+            this.output.write(seq);
+            // Get the pegs for this sequence's genome.
+            String seqId = seq.getLabel();
+            PegList genomePegs = this.getGenome(seqId);
+            // Now find the extras.  These are written as counter-examples.
+            buffer.clear();
+            genomePegs.findClose(seq, this.extraFeatures, buffer);
+            for (Sequence seq2 : buffer) {
+                seq2.setComment("0");
+                this.output.write(seq2);
+                // Insure the peg isn't re-used.
+                genomePegs.suppress(seq2);
+            }
         }
     }
 
