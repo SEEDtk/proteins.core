@@ -38,4 +38,19 @@ public class SequenceBatch extends Shuffler<Sequence> {
         return retVal;
     }
 
+    /**
+     * Add a sequence to this batch with the specified comment and blacklist it
+     * in the specified peg list.
+     *
+     * @param targetPeg		sequence object for a specified target peg
+     * @param genomePegs	peg list for the source genome
+     * @param comment		comment to be stored with the sequence
+     */
+    public void storeSequence(Sequence targetPeg, PegList genomePegs, String comment) {
+        targetPeg.setComment(comment);
+        this.add(targetPeg);
+        // Blacklist the sequence so we don't reuse it.
+        genomePegs.suppress(targetPeg);
+    }
+
 }

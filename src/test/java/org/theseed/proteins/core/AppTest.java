@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 
 import org.theseed.sequence.FastaInputStream;
@@ -165,6 +166,22 @@ public class AppTest extends TestCase
         testList.suppress(found15);
         testList.findClose(found, 4, buffer);
         assertThat(buffer, contains(found2, found7, found10, found13));
+    }
+
+    /**
+     * test organism directories
+     */
+    public void testOrgDir() {
+        OrganismDirectories orgDir = new OrganismDirectories(new File("src/test"));
+        assertThat(orgDir.size(), equalTo(3));
+        Iterator<String> orgIter = orgDir.iterator();
+        assertTrue(orgIter.hasNext());
+        assertThat(orgIter.next(), equalTo("100.1"));
+        assertTrue(orgIter.hasNext());
+        assertThat(orgIter.next(), equalTo("200.2"));
+        assertTrue(orgIter.hasNext());
+        assertThat(orgIter.next(), equalTo("300.3"));
+        assertFalse(orgIter.hasNext());
     }
 
     /**
