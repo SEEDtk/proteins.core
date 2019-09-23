@@ -91,7 +91,7 @@ public class RoleProcessor extends SetProcessor implements ICommand {
             // Loop through the sequence batches, writing them out.
             for (Map.Entry<Role, SequenceBatch> roleInfo : batchMap.entrySet()) {
                 // Create the output file.
-                File outFile = new File(this.outDir, roleInfo.getKey().getId() + ".tbl");
+                File outFile = new File(this.outDir, roleInfo.getKey().getId() + this.getOutputSuffix());
                 if (this.debug) System.err.println("Creating " + outFile + ".");
                 OutputStream outStream = new FileOutputStream(outFile);
                 this.processPegs(roleInfo.getValue(), outStream);

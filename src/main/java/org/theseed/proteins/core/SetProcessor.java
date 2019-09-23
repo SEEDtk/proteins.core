@@ -240,6 +240,25 @@ public class SetProcessor {
     }
 
     /**
+     * @return the appropriate suffix for output files
+     */
+    public String getOutputSuffix() {
+        String retVal = null;
+        switch (this.format) {
+        case FASTA :
+            retVal = ".fa";
+            break;
+        case DL4J :
+            retVal = ".tbl";
+            break;
+        case ORANGE :
+            retVal = ".csv";
+            break;
+        }
+        return retVal;
+    }
+
+    /**
      * @return an object for iterating through all the genomes
      */
     protected Iterable<String> getGenomes() {
