@@ -35,6 +35,7 @@ public class PegList {
     /** blacklist */
     private Set<Sequence> blackList;
 
+
     /**
      * Subclass for comparing sequences by length.
      */
@@ -165,5 +166,6 @@ public class PegList {
         }
         return retVal;
     }
+
 
 }

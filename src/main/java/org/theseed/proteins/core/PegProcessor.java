@@ -67,7 +67,7 @@ public class PegProcessor extends SetProcessor implements ICommand {
             this.input = new TabbedLineReader(inStream);
             this.colIdx = this.input.findField(this.column);
             // Create the sequence batch for output.
-            SequenceBatch seqBatch = new SequenceBatch(super.getBatchSize());
+            SequenceBatch seqBatch = new SequenceBatch(2000);
             // Read in all the input sequences.
             if (this.debug) System.err.println("Reading pegs from input.");
             for (TabbedLineReader.Line line : this.input) {

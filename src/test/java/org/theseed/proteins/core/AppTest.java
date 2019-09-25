@@ -67,7 +67,7 @@ public class AppTest extends TestCase
         assertThat(line, equalTo("no\tM\tS\tW\tV\tA\tK\tY\tL\tP\tT"));
         assertTrue(sReader.hasNextLine());
         line = sReader.nextLine();
-        assertThat(line, equalTo("yes\tM\tP\tR\tL\tL\t-\t-\t-\t-\t-"));
+        assertThat(line, equalTo("yes\tM\tP\tR\tL\tL\t*\t-\t-\t-\t-"));
         assertFalse(sReader.hasNextLine());
         sReader.close();
         stream1 = new FileOutputStream(testFile);
@@ -85,7 +85,7 @@ public class AppTest extends TestCase
         assertThat(line, equalTo("M,S,W,V,A,K,Y,L,P,T,0"));
         assertTrue(sReader.hasNextLine());
         line = sReader.nextLine();
-        assertThat(line, equalTo("M,P,R,L,L,-,-,-,-,-,1"));
+        assertThat(line, equalTo("M,P,R,L,L,*,-,-,-,-,1"));
         assertFalse(sReader.hasNextLine());
         sReader.close();
         stream1 = new FileOutputStream(testFile);
@@ -106,6 +106,24 @@ public class AppTest extends TestCase
         assertThat(seq.getSequence(), equalTo("MPRLL"));
         assertFalse(stream3.hasNext());
         stream3.close();
+        stream1 = new FileOutputStream(testFile);
+        sWriter = new ProteinSequenceWriter(stream1, 10);
+        sWriter.write("id1", "0", "MSWVAKYLPTRPTVPVLSGVLLTGSDSGL");
+        sWriter.write("id2", "1", "MPRLL");
+        sWriter.close();
+        stream2 = new FileInputStream(testFile);
+        sReader = new Scanner(stream2);
+        assertTrue(sReader.hasNextLine());
+        line = sReader.nextLine();
+        assertThat(line, equalTo("seq_id\tp1\tp2\tp3\tp4\tp5\tp6\tp7\tp8\tp9\tp10"));
+        assertTrue(sReader.hasNextLine());
+        line = sReader.nextLine();
+        assertThat(line, equalTo("id1\tM\tS\tW\tV\tA\tK\tY\tL\tP\tT"));
+        assertTrue(sReader.hasNextLine());
+        line = sReader.nextLine();
+        assertThat(line, equalTo("id2\tM\tP\tR\tL\tL\t*\t-\t-\t-\t-"));
+        assertFalse(sReader.hasNextLine());
+        sReader.close();
     }
 
     /**

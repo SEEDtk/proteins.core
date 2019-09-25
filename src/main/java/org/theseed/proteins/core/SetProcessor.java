@@ -7,16 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.theseed.io.TabbedLineReader;
 import org.theseed.sequence.Sequence;
 
 /**
@@ -42,21 +38,11 @@ public class SetProcessor {
 
     // FIELDS
 
-    /** current map of genome IDs to sequence lists */
-    private Map<String, PegList> genomeMap;
     /** input stream */
     protected InputStream inStream;
+    /** coreSEED manager */
+    CoreUtilities coreSeed;
 
-    // CONSTANTS
-
-    /** path-and-name suffix to convert a genome ID to the complete path to the peg FASTA file */
-    private static final String PEG_FILE_SUFFIX = File.separator + "Features" + File.separator + "peg" + File.separator + "fasta";
-
-    /** path-and-name suffix to convert a genome ID to the complete path to the assigned-functions file */
-    private static final String FUNCTION_FILE_SUFFIX = File.separator + "assigned_functions";
-
-    /** path-and-name suffix to convert a genome ID to the complete path to the deleted-pegs file */
-    private static final String DELETED_PEGS_FILE_SUFFIX = File.separator + "Features" + File.separator + "peg" + File.separator + "deleted.features";
 
     // COMMAND-LINE OPTIONS
 
@@ -77,10 +63,6 @@ public class SetProcessor {
     /** output format */
     @Option(name = "--format", aliases = { "-o" }, usage = "format for output sequences")
     private SequenceWriter.Type format;
-    /** number of input sequences to process in each batch */
-    @Option(name = "--batch", aliases = { "--batchSize",
-            "-b" }, metaVar = "1000", usage = "number of input sequences per batch")
-    private int batchSize;
     /** input file (if not using STDIN) */
     @Option(name = "--input", aliases = { "-i" }, usage = "input file (if not STDIN)")
     private File inFile;
@@ -105,7 +87,6 @@ public class SetProcessor {
         // Set the defaults.
         this.help = false;
         this.debug = false;
-        this.batchSize = 100;
         this.extraFeatures = 1;
         this.format = SequenceWriter.Type.FASTA;
         this.maxCols = 0;
@@ -124,8 +105,8 @@ public class SetProcessor {
                 this.inStream = System.in;
                 if (this.inFile != null)
                     this.inStream = new FileInputStream(this.inFile);
-                // Create the genome map.
-                this.genomeMap = new HashMap<String, PegList>(this.batchSize);
+                // Create the coreSEED manager.
+                this.coreSeed = new CoreUtilities(this.debug, this.orgDir);
                 // We made it this far, we can run the application.
                 retVal = true;
             }
@@ -154,7 +135,7 @@ public class SetProcessor {
         // Create a buffer for counter-example sequences.
         ArrayList<Sequence> buffer = new ArrayList<Sequence>(this.extraFeatures);
         // Open the output stream.
-        int colMax = (this.maxCols == 0 ? seqBatch.longest() : this.maxCols);
+        int colMax = (this.maxCols == 0 ? seqBatch.longest() + 1 : this.maxCols);
         if (this.debug) System.err.println("Producing output with column bias of " + colMax + ".");
         SequenceWriter output = SequenceWriter.create(this.format, outStream, colMax);
         for (Sequence seq : seqBatch) {
@@ -214,30 +195,10 @@ public class SetProcessor {
         // To get the genome ID, we pull out everything between "fig|" and ".peg".
         String genomeId = StringUtils.substringBetween(pegId, "fig|", ".peg");
         // Try to find the genome in the cache.
-        PegList retVal = this.genomeMap.get(genomeId);
-        if (retVal == null) {
-            // Here we have to read the genome in.
-            File pegFile = new File(this.orgDir, genomeId + PEG_FILE_SUFFIX);
-            if (! pegFile.isFile()) {
-                // The genome is not found, so we leave our return value NULL.
-                if (this.debug) System.err.println("Genome not found for input peg " + pegId + ".");
-            } else {
-                // Here the genome does exist.
-                if (this.debug) System.err.println("Reading genome " + genomeId + ".");
-                retVal = new PegList(pegFile);
-                // Cache the genome in case it comes up again.
-                this.genomeMap.put(genomeId, retVal);
-            }
-        }
+        PegList retVal = this.coreSeed.getGenomePegs(genomeId);
         return retVal;
     }
 
-    /**
-     * @return the batch size used to estimate the pre-allocation size of each sequence batch
-     */
-    protected int getBatchSize() {
-        return this.batchSize;
-    }
 
     /**
      * @return the appropriate suffix for output files
@@ -262,46 +223,20 @@ public class SetProcessor {
      * @return an object for iterating through all the genomes
      */
     protected Iterable<String> getGenomes() {
-        if (this.debug) System.err.println("Reading genomes from " + this.orgDir + ".");
-        OrganismDirectories retVal = new OrganismDirectories(this.orgDir);
-        if (this.debug) System.err.println(retVal.size() + " genomes found.");
-        return retVal;
+        return this.coreSeed.getGenomes();
     }
 
     /**
-     * @return a map of peg IDs to functions for a genome
+     * Get a map from peg IDs to functions for a genome.
      *
-     * @param the genome ID
+     * @param genomeId	ID of the genome of interest
+     *
+     * @return a map from each peg ID to its assigned function
      *
      * @throws IOException
      */
-    public Map<String, String> getGenomeFunctions(String genomeId) throws IOException {
-        Map<String, String> retVal = new HashMap<String, String>(this.batchSize);
-        // This set will hold the deleted features.
-        Set<String> deletedPegs = new HashSet<String>(this.batchSize);
-        File deleteFile = new File(this.orgDir, genomeId + DELETED_PEGS_FILE_SUFFIX);
-        if (deleteFile.exists()) {
-            if (this.debug) System.err.println("Reading deleted pegs for " + genomeId + ".");
-            try (TabbedLineReader deleteReader = new TabbedLineReader(deleteFile, 1)) {
-                for (TabbedLineReader.Line line : deleteReader) {
-                    String peg = line.get(0);
-                    deletedPegs.add(peg);
-                }
-            }
-        }
-        // Now, pull in all the un-deleted pegs, and map each peg to its function.  Because we are
-        // storing the pegs in a map, only the last function will be kept, which is desired behavior.
-        File functionFile = new File(this.orgDir, genomeId + FUNCTION_FILE_SUFFIX);
-        try (TabbedLineReader functionReader = new TabbedLineReader(functionFile, 2)) {
-            if (this.debug) System.err.println("Reading assigned functions for " + genomeId + ".");
-            for (TabbedLineReader.Line line : functionReader) {
-                String peg = line.get(0);
-                if (peg.contains("peg") && ! deletedPegs.contains(peg)) {
-                    retVal.put(peg, line.get(1));
-                }
-            }
-        }
-        return retVal;
+    protected Map<String, String> getGenomeFunctions(String genomeId) throws IOException {
+        return this.coreSeed.getGenomeFunctions(genomeId);
     }
 
 }

@@ -7,13 +7,15 @@ import org.theseed.utils.ICommand;
 /**
  * Main Application Class
  *
- * This class produces training sets for role identification neural nets.  It has two modes, one
+ * This class produces training and prediction sets for role identification neural nets.  It has two modes, one
  * for processing a list of pegs, and one for processing a list of roles.
  *
  * The commands are
  *
- * pegs		input contains a list of roles
- * roles	input contains a role map, with role IDs and role names
+ * pegs		input contains a list of roles, produces training set
+ * roles	input contains a role map, with role IDs and role names, produces training set
+ * fasta	input contains a FASTA, produces prediction set
+ * proteins	input contains a list of roles, produces prediction set
  *
  */
 public class App
@@ -30,6 +32,12 @@ public class App
             break;
         case "roles" :
             processor = new RoleProcessor();
+            break;
+        case "fasta" :
+            processor = new FastaProcessor();
+            break;
+        case "proteins" :
+            processor = new ProteinProcessor();
             break;
         default :
             throw new RuntimeException("Invalid command " + command + ": must be \"pegs\" or \"roles\".");

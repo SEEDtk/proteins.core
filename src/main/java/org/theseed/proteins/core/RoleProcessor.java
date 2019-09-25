@@ -66,7 +66,7 @@ public class RoleProcessor extends SetProcessor implements ICommand {
                 for (TabbedLineReader.Line line : roleStream) {
                     Role newRole = new Role(line.get(0), line.get(1));
                     targetRoles.put(newRole);
-                    batchMap.put(newRole, new SequenceBatch(this.getBatchSize()));
+                    batchMap.put(newRole, new SequenceBatch(2000));
                 }
             }
             // Loop through all the organism directories.

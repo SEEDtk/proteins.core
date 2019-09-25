@@ -108,7 +108,12 @@ public abstract class SequenceWriter implements Closeable, AutoCloseable {
         char chr = (n > 0 ? sequence.charAt(0) : '-');
         buffer.append(chr);
         for (int i = 1; i < len; i++) {
-            chr = (i < n ? sequence.charAt(i) : '-');
+            if (i < n)
+                chr = sequence.charAt(i);
+            else if (i == n)
+                chr = '*';
+            else
+                chr = '-';
             buffer.append(delim);
             buffer.append(chr);
         }
