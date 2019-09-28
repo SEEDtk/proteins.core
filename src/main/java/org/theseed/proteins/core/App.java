@@ -40,7 +40,7 @@ public class App
             processor = new ProteinProcessor();
             break;
         default :
-            throw new RuntimeException("Invalid command " + command + ": must be \"pegs\" or \"roles\".");
+            throw new RuntimeException("Invalid command " + command + ": must be \"pegs\", \"roles\", \"fasta\", or \"proteins\".");
         }
         boolean ok = processor.parseCommand(newArgs);
         if (ok) {
