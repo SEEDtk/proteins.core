@@ -30,7 +30,7 @@ public abstract class SequenceWriter implements Closeable, AutoCloseable {
         FASTA,
         /** comma-delimited, fixed width, 0/1 last */
         ORANGE,
-        /** tab-delimited, fixed width, yes/no first */
+        /** tab-delimited, fixed width, 1.0/0.0 first */
         DL4J
     };
 

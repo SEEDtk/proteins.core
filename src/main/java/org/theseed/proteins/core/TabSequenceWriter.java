@@ -27,7 +27,7 @@ public class TabSequenceWriter extends SequenceWriter {
         this.len = max;
         this.buffer = new TextStringBuilder(max * 4 + 10);
         // Format and write the header.
-        this.buffer.append("class\t");
+        this.buffer.append("found\t");
         this.formatHeader(this.buffer, max, "\t");
         this.println(this.buffer.toString());
     }
@@ -36,9 +36,9 @@ public class TabSequenceWriter extends SequenceWriter {
     public void write(String id, String comment, String seq) {
         this.buffer.setLength(0);
         if (comment.contentEquals("0")) {
-            this.buffer.append("no\t");
+            this.buffer.append("0.0\t");
         } else {
-            this.buffer.append("yes\t");
+            this.buffer.append("1.0\t");
         }
         this.formatSeq(this.buffer, seq, this.len, "\t");
         this.println(this.buffer.toString());
