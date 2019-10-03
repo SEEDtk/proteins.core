@@ -15,12 +15,16 @@ public class PredictProcessor {
 
     /** control file input stream */
     private TabbedLineReader controlStream;
+
     /** help option */
     @Option(name = "-h", aliases = { "--help" }, help = true)
     protected boolean help;
     /** TRUE if we want progress messages */
     @Option(name = "-v", aliases = { "--verbose", "--debug" }, usage = "display progress on STDERR")
     protected boolean debug;
+    /** output format -- default is DL4J */
+    @Option(name = "--format", aliases = { "-o" }, usage = "format for output sequences")
+    private SequenceWriter.Type format;
     /** output directory */
     @Argument(index = 0, metaVar = "outDir", usage = "output directory", required = true)
     private File outDir;
@@ -30,6 +34,10 @@ public class PredictProcessor {
 
     public PredictProcessor() {
         super();
+        // Set the parameter defaults.
+        this.help = false;
+        this.debug = false;
+        this.format = SequenceWriter.Type.DL4J;
     }
 
     /**
@@ -63,10 +71,10 @@ public class PredictProcessor {
             String modelName = line.get(0);
             int modelWidth = line.getInt(1);
             // Create the output file.
-            File proteinFile = new File(this.outDir, modelName + ".tbl");
+            File proteinFile = new File(this.outDir, modelName + SequenceWriter.suffix(this.format));
             if (this.debug) System.err.println("Creating output in " + proteinFile + " with width " + modelWidth + ".");
             FileOutputStream proteinStream = new FileOutputStream(proteinFile);
-            try (ProteinSequenceWriter proteinWriter = new ProteinSequenceWriter(proteinStream, modelWidth)) {
+            try (SequenceWriter proteinWriter = SequenceWriter.predictStream(this.format, proteinStream, modelWidth)) {
                 for (Sequence seq : inSequences) {
                     proteinWriter.write(seq);
                 }

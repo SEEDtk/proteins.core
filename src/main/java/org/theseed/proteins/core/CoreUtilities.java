@@ -134,7 +134,7 @@ public class CoreUtilities {
     /**
      * @return an object for iterating through all the genomes
      */
-    protected Iterable<String> getGenomes() {
+    public Iterable<String> getGenomes() {
         if (this.debug) System.err.println("Reading genomes from " + this.orgDir + ".");
         OrganismDirectories retVal = new OrganismDirectories(this.orgDir);
         if (this.debug) System.err.println(retVal.size() + " genomes found.");

@@ -67,6 +67,27 @@ public abstract class SequenceWriter implements Closeable, AutoCloseable {
     }
 
     /**
+     * @return the appropriate file suffix for the specified format.
+     *
+     * @param format	format for the file name being constructed
+     */
+    public static String suffix(Type format) {
+    	String retVal = null;
+    	switch (format) {
+    	case FASTA :
+    		retVal = ".fa";
+    		break;
+    	case ORANGE :
+    		retVal = ".csv";
+    		break;
+    	case DL4J :
+    		retVal = ".tbl";
+    		break;
+    	}
+    	return retVal;
+    }
+
+    /**
      * Write out a sequence record.
      *
      * @param id		sequence identifier
@@ -143,5 +164,30 @@ public abstract class SequenceWriter implements Closeable, AutoCloseable {
     public void close() {
         this.outStream.close();
     }
+
+    /**
+     * Create an output writer for prediction files.
+     *
+     * @param format		output format-- FASTA, DL4J, or ORANGE
+     * @param proteinStream	output stream for the writer
+     * @param modelWidth	width of the output (for non-FASTA)
+     *
+     * @return an open stream for writing prediction requests in the proper format.
+     */
+	public static SequenceWriter predictStream(Type format, OutputStream proteinStream, int modelWidth) {
+		SequenceWriter retVal = null;
+		switch (format) {
+		case DL4J:
+			retVal = new ProteinSequenceWriter(proteinStream, modelWidth);
+			break;
+		case FASTA:
+			retVal = new FastaSequenceWriter(proteinStream);
+			break;
+		case ORANGE:
+			retVal = new CommaPredictSequenceWriter(proteinStream, modelWidth);
+			break;
+		}
+		return retVal;
+	}
 
 }

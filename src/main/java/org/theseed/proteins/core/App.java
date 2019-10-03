@@ -16,6 +16,7 @@ import org.theseed.utils.ICommand;
  * roles	input contains a role map, with role IDs and role names, produces training set
  * fasta	input contains a FASTA, produces prediction set
  * proteins	input contains a list of roles, produces prediction set
+ * collate	input contains a list of roles, produces one FASTA for each role
  *
  */
 public class App
@@ -39,6 +40,9 @@ public class App
         case "proteins" :
             processor = new ProteinProcessor();
             break;
+        case "collate" :
+        	processor = new CollateProcessor();
+        	break;
         default :
             throw new RuntimeException("Invalid command " + command + ": must be \"pegs\", \"roles\", \"fasta\", or \"proteins\".");
         }
