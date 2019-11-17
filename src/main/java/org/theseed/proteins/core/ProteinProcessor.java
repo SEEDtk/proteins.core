@@ -38,6 +38,7 @@ import org.theseed.utils.ICommand;
  * 				all pegs but the ones with the input roles will be selected
  * --core		name of the coreSEED Organisms directory; the default is <code>FIGdisk/FIG/Data/Organisms</code>
  * 				in the current directory
+ * --single		if specified, only singleton roles are considered to match
  *
  *
  * @author Bruce Parrello
@@ -69,6 +70,11 @@ public class ProteinProcessor extends PredictProcessor implements ICommand {
     @Option(name = "--reverse", aliases = { "-r" }, usage = "if specified, input roles will be excluded instead of selected")
     private boolean reverse;
 
+    /** singleton flag */
+    @Option(name = "--single", aliases = { "-s", "-u" }, usage = "if specified, only singly-functional proteins will be output")
+    private boolean single;
+
+
     @Override
     public boolean parseCommand(String[] args) {
         boolean retVal = false;
@@ -78,6 +84,7 @@ public class ProteinProcessor extends PredictProcessor implements ICommand {
         this.inFile = null;
         this.orgDir = new File("FIGdisk/FIG/Data/Organisms");
         this.reverse = false;
+        this.single = false;
         this.roleCol = "0";
         // Parse the command line.
         CmdLineParser parser = new CmdLineParser(this);
@@ -145,18 +152,21 @@ public class ProteinProcessor extends PredictProcessor implements ICommand {
                     for (Map.Entry<String, String> pegInfo : pegRoles.entrySet()) {
                         // Break the assignment into roles.
                         String[] roles = Feature.rolesOfFunction(pegInfo.getValue());
-                        // Does this sequence have one of our target roles?
-                        boolean found = false;
-                        for (String roleDesc : roles) {
-                            Role role = this.roleMap.getByName(roleDesc);
-                            if (role != null) found = true;
-                        }
-                        // Process it accordingly.
-                        if (found != this.reverse) {
-                            // Get the protein sequence for this peg.
-                            Sequence pegSequence = pegSequences.get(pegInfo.getKey());
-                            if (pegSequence != null)
-                                inSequences.add(pegSequence);
+                        // Perform the singleton filtering here.
+                        if (roles.length == 1 || ! this.single) {
+                            // Does this sequence have one of our target roles?
+                            boolean found = false;
+                            for (String roleDesc : roles) {
+                                Role role = this.roleMap.getByName(roleDesc);
+                                if (role != null) found = true;
+                            }
+                            // Process it accordingly.
+                            if (found != this.reverse) {
+                                // Get the protein sequence for this peg.
+                                Sequence pegSequence = pegSequences.get(pegInfo.getKey());
+                                if (pegSequence != null)
+                                    inSequences.add(pegSequence);
+                            }
                         }
                     }
                 }
