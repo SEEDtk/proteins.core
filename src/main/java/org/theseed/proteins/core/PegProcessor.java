@@ -10,7 +10,7 @@ import org.theseed.io.TabbedLineReader;
 import org.theseed.utils.ICommand;
 
 /**
- * Create a file of proteins sequences from a FIGdisk and a list of PEG IDs.  The basic plan is to read the non-deleted features from
+ * Create a file of protein sequences from a FIGdisk and a list of PEG IDs.  The basic plan is to read the non-deleted features from
  * the <code>fasta<code> file.  The specified features will be included in the output with a "1" notation, and zero or more similar
  * features will be included in the output with a "0" notation.  The number of 0-features included is determined by a command-line
  * option-- the default is <code>1</code>.
