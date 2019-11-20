@@ -17,6 +17,7 @@ import org.theseed.utils.ICommand;
  * fasta	input contains a FASTA, produces prediction set
  * proteins	input contains a list of roles, produces prediction set
  * collate	input contains a list of roles, produces one FASTA for each role
+ * features	input contains a list of feature IDs and comments, produces FASTA file
  *
  */
 public class App
@@ -42,6 +43,9 @@ public class App
             break;
         case "collate" :
             processor = new CollateProcessor();
+            break;
+        case "features" :
+            processor = new FeatureProcessor();
             break;
         default :
             throw new RuntimeException("Invalid command " + command + ": must be \"pegs\", \"roles\", \"fasta\", or \"proteins\".");

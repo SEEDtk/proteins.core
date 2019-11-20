@@ -61,13 +61,13 @@ public class AppTest extends TestCase
         Scanner sReader = new Scanner(stream2);
         assertTrue(sReader.hasNextLine());
         String line = sReader.nextLine();
-        assertThat(line, equalTo("class\tp1\tp2\tp3\tp4\tp5\tp6\tp7\tp8\tp9\tp10"));
+        assertThat(line, equalTo("found\tp1\tp2\tp3\tp4\tp5\tp6\tp7\tp8\tp9\tp10"));
         assertTrue(sReader.hasNextLine());
         line = sReader.nextLine();
-        assertThat(line, equalTo("no\tM\tS\tW\tV\tA\tK\tY\tL\tP\tT"));
+        assertThat(line, equalTo("0.0\tM\tS\tW\tV\tA\tK\tY\tL\tP\tT"));
         assertTrue(sReader.hasNextLine());
         line = sReader.nextLine();
-        assertThat(line, equalTo("yes\tM\tP\tR\tL\tL\t*\t-\t-\t-\t-"));
+        assertThat(line, equalTo("1.0\tM\tP\tR\tL\tL\t*\t-\t-\t-\t-"));
         assertFalse(sReader.hasNextLine());
         sReader.close();
         stream1 = new FileOutputStream(testFile);
@@ -200,6 +200,15 @@ public class AppTest extends TestCase
         assertTrue(orgIter.hasNext());
         assertThat(orgIter.next(), equalTo("300.3"));
         assertFalse(orgIter.hasNext());
+    }
+
+    /**
+     * test genome ID extraction
+     */
+    public void testGenomeIds() {
+        assertThat(CoreUtilities.genomeOf("fig|12345.6.peg.10"), equalTo("12345.6"));
+        assertThat(CoreUtilities.genomeOf("fig|23456.789.202.10"), equalTo("23456.789"));
+        assertThat(CoreUtilities.genomeOf("patric|123.45.peg.10"), equalTo(null));
     }
 
     /**

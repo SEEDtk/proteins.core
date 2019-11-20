@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.theseed.io.TabbedLineReader;
 
@@ -38,6 +40,9 @@ public class CoreUtilities {
 
     /** path-and-name suffix to convert a genome ID to the complete path to the peg FASTA file */
     private static final String PEG_FILE_SUFFIX = File.separator + "Features" + File.separator + "peg" + File.separator + "fasta";
+
+    /** genome ID extraction pattern */
+    private static final Pattern GENOME_ID_PATTERN = Pattern.compile("fig\\|(\\d+\\.\\d+)\\.\\w+\\.\\d+");
 
     /**
      * Connect this object to an organism directory and initialize the genome cache.
@@ -141,5 +146,18 @@ public class CoreUtilities {
         return retVal;
     }
 
+    /**
+     * @return the genome ID for a feature ID
+     *
+     * @param fid	the feature ID from which the genome ID is to be computed
+     */
+    public static String genomeOf(String fid) {
+        Matcher matcher = GENOME_ID_PATTERN.matcher(fid);
+        String retVal = null;
+        if (matcher.matches()) {
+            retVal = matcher.group(1);
+        }
+        return retVal;
+    }
 
 }
