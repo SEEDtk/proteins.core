@@ -111,7 +111,7 @@ public class ProteinProcessor extends PredictProcessor implements ICommand {
                         String role = line.get(colIdx);
                         roleMap.register(role);
                     }
-                    if (this.debug) System.err.println(this.roleMap.size() + " roles found in input.");
+                    if (this.debug) System.err.println(this.roleMap.fullSize() + " roles found in input.");
                 } finally {
                     inStream.close();
                 }
