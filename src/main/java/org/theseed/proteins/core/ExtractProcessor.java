@@ -91,7 +91,7 @@ public class ExtractProcessor extends BaseProcessor {
     }
 
     @Override
-    public void run() {
+    public void runCommand() throws Exception {
         try {
             // Get a set of all the roles.
             Set<String> roleSet = this.usefulRoles.keySet();
@@ -130,8 +130,6 @@ public class ExtractProcessor extends BaseProcessor {
                 System.out.format("%s\t%s\t%d\t%d%n", roleId, roleName, this.roleCounts.good(roleId),
                         this.roleCounts.bad(roleId));
             }
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
         } finally {
             this.fastaStream.close();
         }

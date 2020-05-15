@@ -36,7 +36,7 @@ public class FastaProcessor extends PredictProcessor implements ICommand {
     // FIELDS
     /** input stream */
     private FastaInputStream inStream;
-    
+
 
     // COMMAND-LINE OPTIONS
 
