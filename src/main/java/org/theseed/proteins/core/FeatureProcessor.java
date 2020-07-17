@@ -12,6 +12,8 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.theseed.genome.core.CoreUtilities;
+import org.theseed.genome.core.PegList;
 import org.theseed.io.TabbedLineReader;
 import org.theseed.sequence.FastaOutputStream;
 import org.theseed.sequence.Sequence;

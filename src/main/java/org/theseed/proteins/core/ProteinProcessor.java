@@ -13,6 +13,8 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.theseed.genome.Feature;
+import org.theseed.genome.core.CoreUtilities;
+import org.theseed.genome.core.PegList;
 import org.theseed.io.TabbedLineReader;
 import org.theseed.proteins.Role;
 import org.theseed.proteins.RoleMap;

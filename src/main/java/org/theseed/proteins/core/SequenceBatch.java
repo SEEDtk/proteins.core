@@ -3,6 +3,7 @@
  */
 package org.theseed.proteins.core;
 
+import org.theseed.genome.core.PegList;
 import org.theseed.io.Shuffler;
 import org.theseed.sequence.Sequence;
 
