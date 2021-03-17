@@ -78,6 +78,8 @@ public class PegProcessor extends SetProcessor implements ICommand {
             processPegs(seqBatch, System.out);
         } catch (IOException e) {
             e.printStackTrace(System.err);
+        } finally {
+            this.input.close();
         }
     }
 }

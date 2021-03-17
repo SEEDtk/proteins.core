@@ -139,6 +139,8 @@ public class FeatureProcessor implements ICommand {
             }
         } catch (IOException e) {
             e.printStackTrace(System.err);
+        } finally {
+            this.input.close();
         }
     }
 

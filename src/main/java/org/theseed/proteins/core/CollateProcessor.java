@@ -158,6 +158,8 @@ public class CollateProcessor implements ICommand {
             }
         } catch (IOException e) {
             e.printStackTrace(System.err);
+        } finally {
+            this.inStream.close();
         }
     }
 

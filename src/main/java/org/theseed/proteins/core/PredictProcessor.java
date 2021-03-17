@@ -82,4 +82,10 @@ public class PredictProcessor {
         }
     }
 
+    @Override
+    public void finalize() {
+        if (this.controlStream != null)
+            this.controlStream.close();
+    }
+
 }
